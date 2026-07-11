@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>INTEGRAL REPUESTOS - Sistema de Cuentas Corrientes</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self' https://*.workers.dev; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
@@ -161,7 +161,36 @@ tr:hover td{background:var(--bg)}
   50% { opacity: 0.3; }
 }
 
-@media(max-width:768px){.header{padding:10px 16px}.nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);flex-direction:column;padding:10px;box-shadow:var(--shadow-lg);border-top:1px solid var(--border)}.nav.open{display:flex}.local-selector{border-right:none;margin-right:0;padding-right:0;margin-bottom:8px}.mobile-menu-btn{display:block}.main{padding:16px}.stats-grid{grid-template-columns:1fr}.toolbar{flex-direction:column;align-items:stretch}.search-box{min-width:100%}.detail-stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.modal{padding:20px}}
+.bottom-nav{display:none}
+.mobile-extra-menu{display:contents}
+@media(max-width:768px){
+  body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+  .header{padding:10px 16px}
+  .nav{display:none}
+  .local-selector{border-right:none;margin-right:0;padding-right:0;flex-direction:column;width:100%}
+  .local-selector .local-btn{width:100%;text-align:center}
+  .mobile-menu-btn{display:block}
+  .main{padding:16px}
+  .stats-grid{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search-box{min-width:100%}
+  .detail-stats{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .modal{padding:20px}
+
+  .mobile-extra-menu{display:none;position:absolute;top:100%;right:16px;left:16px;background:var(--card);flex-direction:column;padding:14px;box-shadow:var(--shadow-lg);border:1px solid var(--border);border-radius:14px;gap:10px;z-index:150}
+  .mobile-extra-menu.open{display:flex}
+  #syncStatusBtn,.mobile-extra-menu > button{width:100%;justify-content:center}
+
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);z-index:120;padding:6px 2px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;box-shadow:0 -2px 10px rgb(0 0 0/0.08)}
+  .bottom-nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.62rem;font-weight:700;color:var(--text-light);padding:4px 2px;flex:1;cursor:pointer;border-radius:10px}
+  .bottom-nav button .bn-icon{font-size:1.25rem;line-height:1}
+  .bottom-nav button.active{color:var(--primary)}
+}
+@media(max-width:400px){
+  .bottom-nav button{font-size:.56rem}
+  .bottom-nav button .bn-icon{font-size:1.15rem}
+}
 .fade-in{animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
@@ -291,11 +320,6 @@ tr:hover td{background:var(--bg)}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <div class="local-selector">
-      <button class="local-btn active" data-local="0" onclick="changeLocal(0)">Local 1</button>
-      <button class="local-btn" data-local="1" onclick="changeLocal(1)">Local 2</button>
-      <button class="local-btn" data-local="2" onclick="changeLocal(2)">Local 3</button>
-    </div>
     <nav class="nav" id="mainNav">
       <button class="active" onclick="showPage('clientes')">📋 Cta. Cte.</button>
       <button onclick="showPage('ventas')">📦 Ventas</button>
@@ -304,12 +328,28 @@ tr:hover td{background:var(--bg)}
       <button onclick="showPage('reportes')">📊 Reportes</button>
     </nav>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
-    <button id="syncStatusBtn" onclick="openSyncModal()" title="Configurar sincronización" style="padding:8px 14px;background:var(--bg);color:var(--text-light);border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
-      <span id="syncStatusIcon">⚪</span> <span id="syncStatusText">Sin config.</span>
-    </button>
-    <button onclick="logout()" style="padding:8px 14px;background:var(--danger);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--danger)'">🚪 Salir</button>
+    <div class="mobile-extra-menu" id="mobileExtras">
+      <div class="local-selector">
+        <button class="local-btn active" data-local="0" onclick="changeLocal(0)">Local 1</button>
+        <button class="local-btn" data-local="1" onclick="changeLocal(1)">Local 2</button>
+        <button class="local-btn" data-local="2" onclick="changeLocal(2)">Local 3</button>
+      </div>
+      <button id="syncStatusBtn" onclick="openSyncModal()" title="Configurar sincronización" style="padding:8px 14px;background:var(--bg);color:var(--text-light);border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <span id="syncStatusIcon">⚪</span> <span id="syncStatusText">Sin config.</span>
+      </button>
+      <button onclick="logout()" style="padding:8px 14px;background:var(--danger);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--danger)'">🚪 Salir</button>
+    </div>
   </div>
 </div>
+
+<!-- BARRA DE NAVEGACIÓN INFERIOR (solo en celular, estilo app nativa) -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" onclick="showPage('clientes')"><span class="bn-icon">📋</span>Cta. Cte.</button>
+  <button onclick="showPage('ventas')"><span class="bn-icon">📦</span>Ventas</button>
+  <button onclick="showPage('registro')"><span class="bn-icon">➕</span>Registro</button>
+  <button onclick="showPage('cheques')"><span class="bn-icon">🏦</span>Cheques</button>
+  <button onclick="showPage('reportes')"><span class="bn-icon">📊</span>Reportes</button>
+</nav>
 
 <!-- MODAL SINCRONIZACIÓN -->
 <div class="modal-overlay" id="syncModal">
@@ -1053,12 +1093,17 @@ function showPage(page) {
   const map = {'clientes':0,'ventas':1,'registro':2,'cheques':3,'reportes':4};
   if (map[page] !== undefined) navButtons[map[page]].classList.add('active');
 
+  const bottomButtons = document.querySelectorAll('.bottom-nav button');
+  document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
+  if (map[page] !== undefined && bottomButtons[map[page]]) bottomButtons[map[page]].classList.add('active');
+
   document.getElementById('mainNav').classList.remove('open');
+  document.getElementById('mobileExtras').classList.remove('open');
   updateStats();
 }
 
 function toggleMobileMenu() {
-  document.getElementById('mainNav').classList.toggle('open');
+  document.getElementById('mobileExtras').classList.toggle('open');
 }
 
 // ===================== CLIENTES (ACCORDION) =====================
